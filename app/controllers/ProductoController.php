@@ -1,27 +1,29 @@
 <?php
-require_once './models/Mesa.php';
+require_once './models/Producto.php';
 // require_once './interfaces/IApiUsable.php';
 
-class MesaController //implements IApiUsable
+class ProductoController //implements IApiUsable
 {
     public function CargarUno($request, $response, $args)
     {
-        $permitted_chars = '0123456789abcdefghijklmnopqrstuvwxyz';
-        $codigoAlfanumerico = substr(str_shuffle($permitted_chars), 0, 10);
         $parametros = $request->getParsedBody();
 
-        $numero = $parametros['numero'];
-        $estado = $parametros['estado'];
-        
-        // Creamos el usuario
-        $mesa = new Mesa();
-        $mesa->numero = $numero;
-        $mesa->estado = $estado;
-        $mesa->codigo = $codigoAlfanumerico;
+        $precio = $parametros['precio'];
+        $tipo = $parametros['tipo'];
+        $nombre = $parametros['nombre'];
+        $tiempoProducto = $parametros['tiempoProducto'];
+        $stock = $parametros['stock'];
 
-        $mesa->save();
+        $prod = new Producto();
+        $prod->precio = $precio;
+        $prod->tipo = $tipo;
+        $prod->nombre = $nombre;
+        $prod->tiempoProducto = $tiempoProducto;
+        $prod->stock = $stock;
 
-        $payload = json_encode(array("mensaje" => "Mesa creada con exito"));
+        $prod->save();
+
+        $payload = json_encode(array("mensaje" => "Producto creado con exito"));
 
         $response->getBody()->write($payload);
         return $response
@@ -30,10 +32,10 @@ class MesaController //implements IApiUsable
 
     public function TraerUno($request, $response, $args)
     {
-        $mesas = Mesa::all();
-        $mesa = $mesas->find($args['id']);
+        $prods = Producto::all();
+        $prod = $prods->find($args['id']);
 
-        $payload = json_encode($mesa);
+        $payload = json_encode($prod);
 
         $response->getBody()->write($payload);
         return $response
@@ -42,8 +44,8 @@ class MesaController //implements IApiUsable
 
     public function TraerTodos($request, $response, $args)
     {
-        $mesas = Mesa::all();
-        $payload = json_encode(array("listaMesas" => $mesas));
+        $prods = Producto::all();
+        $payload = json_encode(array("listaUsuario" => $prods));
 
         $response->getBody()->write($payload);
         return $response
@@ -55,7 +57,8 @@ class MesaController //implements IApiUsable
         $parametros = $request->getParsedBody();
 
         $nombre = $parametros['nombre'];
-        
+        Usuario::modificarUsuario($nombre);
+
         $payload = json_encode(array("mensaje" => "Usuario modificado con exito"));
 
         $response->getBody()->write($payload);
@@ -67,22 +70,19 @@ class MesaController //implements IApiUsable
     {
         $res = false;
         try {
-            $mesas = Mesa::all();
-            $mesa = $mesas->find($args['id']);
-            $res = $mesa->delete();
+            $prods = Usuario::all();
+            $prod = $prods->find($args['id']);
+            $res = $prod->delete();
         } catch (\Throwable $th) {
-            $payload = json_encode(array("mensaje" => "Error al borrar mesa: ". $th->getMessage()));
+            $payload = json_encode(array("mensaje" => "Error al borrar producto: ". $th->getMessage()));
         }
 
         if($res){
-            $payload = json_encode(array("mensaje" => "Mesa borrado con exito"));
+            $payload = json_encode(array("mensaje" => "Producto borrado con exito"));
         }
-
 
         $response->getBody()->write($payload);
         return $response
           ->withHeader('Content-Type', 'application/json');
     }
 }
-
-?>
