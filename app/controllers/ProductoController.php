@@ -21,9 +21,8 @@ class ProductoController //implements IApiUsable
         $prod->tiempoProducto = $tiempoProducto;
         $prod->stock = $stock;
 
-        $prod->save();
-
         $payload = json_encode(array("mensaje" => "Producto creado con exito"));
+        MyValidation::CorrectProduct($prod) ? $prod->save() : $payload = json_encode(array("mensaje" => "Producto no creado."));
 
         $response->getBody()->write($payload);
         return $response
@@ -54,12 +53,26 @@ class ProductoController //implements IApiUsable
     
     public function Modificar($request, $response, $args)
     {
+        $id = $args['id'];
         $parametros = $request->getParsedBody();
+        $prod = Producto::where('id', '=', $id)->first();
 
-        $nombre = $parametros['nombre'];
-        Usuario::modificarUsuario($nombre);
+        if($prod != null && MyValidation::CorrectProduct($prod))
+        {
+            //Valido que el producto sea correcto.
+            $prod->precio = $parametros['precio'];
+            $prod->tipo = $parametros['tipo'] == (''||null) ? $prod->tipo : $parametros['tipo'];
+            $prod->nombre = $parametros['nombre'] == (''||null) ? $prod->nombre : $parametros['nombre'];
+            $prod->precio = $parametros['precio'] == (''||null) ? $prod->precio : $parametros['precio'];
+            $prod->tiempoProducto = $parametros['tiempoProducto'] == (''||null) ? $prod->tiempoProducto : $parametros['tiempoProducto'];
+            $prod->stock = $parametros['stock'] == (''||null) ? $prod->stock : $parametros['stock'];
 
-        $payload = json_encode(array("mensaje" => "Usuario modificado con exito"));
+            $prod->save();
+            $payload = json_encode(array("mensaje" => "Producto modificado con exito"));
+        }
+        else{
+            $payload = json_encode(array("mensaje" => "Producto no modificado"));
+        }
 
         $response->getBody()->write($payload);
         return $response

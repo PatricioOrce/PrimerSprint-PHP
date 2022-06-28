@@ -8,24 +8,17 @@ class Pedido extends Model
 {
     use SoftDeletes;
     
-    public $codigo;
-    public $estado;
-    public $nombre;
-    public $productos;
-    public $tiempo;
-
     protected $primaryKey = 'id';
     protected $table = 'pedidos';
     public $incrementing = true;
-    public $timestamps = false;
 
     const UPDATED_AT = 'fechaModificacion';
     const DELETED_AT = 'fechaBaja';
     const CREATED_AT = 'fechaAlta';
     
     protected $fillable = [
-        'codigo', 'estado', 'tiempo',
-        'cliente', 'importe', 'codigoMesa',
+        'codigo', 'estado', 'tiempoEstimado',
+        'nombreCliente', 'importe', 'codigoMesa',
         'idMesa', 'idPedido', 'idUsuario',
         'pathFoto', 'fechaModificacion', 'fechaBaja',
         'fechaAlta'

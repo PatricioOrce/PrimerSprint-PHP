@@ -8,11 +8,9 @@ class Venta extends Model
 {
     use SoftDeletes;
 
-
     protected $primaryKey = 'id';
     protected $table = 'ventas';
     public $incrementing = true;
-    public $timestamps = false;
 
     const UPDATED_AT = 'fechaModificacion';
     const DELETED_AT = 'fechaBaja';

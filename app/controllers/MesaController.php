@@ -1,4 +1,7 @@
 <?php
+
+use Illuminate\Support\Facades\Auth;
+
 require_once './models/Mesa.php';
 // require_once './interfaces/IApiUsable.php';
 
@@ -6,22 +9,30 @@ class MesaController //implements IApiUsable
 {
     public function CargarUno($request, $response, $args)
     {
-        $permitted_chars = '0123456789abcdefghijklmnopqrstuvwxyz';
-        $codigoAlfanumerico = substr(str_shuffle($permitted_chars), 0, 10);
-        $parametros = $request->getParsedBody();
+        if(AutentificadorJWT::GetUserRole($request) == 'socio')
+        {
+            $permitted_chars = '0123456789abcdefghijklmnopqrstuvwxyz';
+            $codigoAlfanumerico = substr(str_shuffle($permitted_chars), 0, 10);
+            $parametros = $request->getParsedBody();
+    
+            $numero = $parametros['numero'];
+            $estado = $parametros['estado'];
+            
+            // Creamos el usuario
+            $mesa = new Mesa();
+            $mesa->numero = $numero;
+            $mesa->estado = $estado;
+            $mesa->codigo = $codigoAlfanumerico;
+    
+            $mesa->save();
+    
+            $payload = json_encode(array("mensaje" => "Mesa creada con exito"));
+        }
+        else{
+            $payload = json_encode(array("mensaje" => "Solamente los socios pueden dar de alta una mesa."));
+        }
 
-        $numero = $parametros['numero'];
-        $estado = $parametros['estado'];
-        
-        // Creamos el usuario
-        $mesa = new Mesa();
-        $mesa->numero = $numero;
-        $mesa->estado = $estado;
-        $mesa->codigo = $codigoAlfanumerico;
 
-        $mesa->save();
-
-        $payload = json_encode(array("mensaje" => "Mesa creada con exito"));
 
         $response->getBody()->write($payload);
         return $response
